@@ -3,7 +3,7 @@
 import argparse
 
 from db_models import db, Book, Review
-from commands import add_review, add_book, list_reviews, list_books, remove_book
+from commands import add_review, add_book, list_reviews, list_books, remove_book, list_books_to_review
 
 
 def create_argparser():
@@ -55,3 +55,5 @@ if __name__ == '__main__':
         add_review(cli_args.name, cli_args.date_shift)
     elif cli_args.command == 'list-reviews':
         list_reviews(cli_args.order_by, cli_args.asc_or_desc)
+    else:
+        list_books_to_review()

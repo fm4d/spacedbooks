@@ -1,6 +1,7 @@
 import datetime
 
 from db_models import Book, Review
+from config import SPACED_REPETITION_INTERVALS
 
 
 def add_book(name, date_shift):
@@ -75,3 +76,17 @@ def list_reviews(order_by, asc_or_desc):
     reviews = Review.select().join(Book, on=(Review.book == Book.id)).order_by(order_field)
     for r in reviews:
         print(r.id, r.book.name, r.date_of_review)
+
+
+def list_books_to_review():
+    for b in Book.select():
+        reviews = Review.select().join(Book, on=(Review.book == Book.id)).where(Book.id == b.id).order_by(Review.date_of_review.asc())
+
+        if not reviews:
+            days_since_last_review = (datetime.date.today() - b.date_of_origin)
+            if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[0]):
+                print(b.id, b.name)
+        else:
+            days_since_last_review = (datetime.date.today() - reviews[-1].date_of_review)
+            if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[len(reviews)]):
+                print(b.id, b.name)
