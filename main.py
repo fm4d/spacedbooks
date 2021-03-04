@@ -3,7 +3,9 @@
 import argparse
 
 from db_models import db, Book, Review
-from commands import add_review, add_book, list_reviews, list_books, remove_book, list_books_to_review
+from commands import (add_review, add_book, list_reviews, list_books,
+                      remove_book, list_books_to_review, remove_review)
+from util import print_reviews, print_books
 
 
 def create_argparser():
@@ -36,6 +38,9 @@ def create_argparser():
                                    help="+ or - X days since/to review",
                                    nargs='?', default='+0')
 
+    remove_review_parser = subparsers.add_parser('remove-review')
+    remove_review_parser.add_argument('id', type=id, help="review id", action='store')
+
     return parser
 
 
@@ -50,10 +55,12 @@ if __name__ == '__main__':
     elif cli_args.command == 'remove-book':
         remove_book(cli_args.name)
     elif cli_args.command == 'list-books':
-        list_books(cli_args.order_by, cli_args.asc_or_desc)
+        print_books(list_books(cli_args.order_by, cli_args.asc_or_desc))
     elif cli_args.command == 'add-review':
         add_review(cli_args.name, cli_args.date_shift)
+    elif cli_args.command == 'remove-review':
+        remove_review(cli_args.id)
     elif cli_args.command == 'list-reviews':
-        list_reviews(cli_args.order_by, cli_args.asc_or_desc)
+        print_reviews(list_reviews(cli_args.order_by, cli_args.asc_or_desc))
     else:
         list_books_to_review()

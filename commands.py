@@ -1,7 +1,7 @@
 import datetime
 
 from db_models import Book, Review
-from config import SPACED_REPETITION_INTERVALS
+from config import SPACED_REPETITION_INTERVALS, LOGGER
 
 
 def add_book(name, date_shift):
@@ -12,7 +12,9 @@ def add_book(name, date_shift):
     else:
         raise Exception("Only +XX or -XX allowed for add_book date")
 
-    Book(name=name, date_origin=adjusted_date).save()
+    Book(name=name, date_of_origin=adjusted_date).save()
+
+    LOGGER.debug("Created new Book(id, name={}, date_origin={})".format(id, name, adjusted_date))
 
 
 def get_book(name_or_id):
@@ -26,7 +28,10 @@ def get_book(name_or_id):
 
 def remove_book(name_or_id):
     book_to_remove = get_book(name_or_id)
+    id, name = book_to_remove.id, book_to_remove.name
     book_to_remove.delete_instance()
+
+    LOGGER.debug("Removed Book(id={}, name={})".format(id, name))
 
 
 def list_books(order_by, asc_or_desc):
@@ -42,9 +47,7 @@ def list_books(order_by, asc_or_desc):
     else:
         order_field = mapper[order_by].desc()
 
-    books = Book.select().order_by(order_field)
-    for b in books:
-        print(b.id, b.name, b.date_of_origin)
+    return list(Book.select().order_by(order_field))
 
 
 def add_review(name_or_id, date_shift):
@@ -57,6 +60,19 @@ def add_review(name_or_id, date_shift):
 
     book = get_book(name_or_id)
     Review(book=book, date_of_review=adjusted_date).save()
+
+    LOGGER.debug("Created Review(Book.name={}, date_of_review={})".format(
+        book.name,
+        adjusted_date
+    ))
+
+
+def remove_review(id):
+    r = Review.select().where(Review.id == id)
+    if len(r) is not 1:
+        raise Exception("Unable to find review, {} reviews found.".format(len(r)))
+
+    r.next().delete_instance()
 
 
 def list_reviews(order_by, asc_or_desc):
@@ -73,9 +89,7 @@ def list_reviews(order_by, asc_or_desc):
     else:
         order_field = mapper[order_by].desc()
 
-    reviews = Review.select().join(Book, on=(Review.book == Book.id)).order_by(order_field)
-    for r in reviews:
-        print(r.id, r.book.name, r.date_of_review)
+    return list(Review.select().join(Book, on=(Review.book == Book.id)).order_by(order_field))
 
 
 def list_books_to_review():
