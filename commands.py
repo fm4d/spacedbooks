@@ -68,11 +68,8 @@ def add_review(name_or_id, date_shift):
 
 
 def remove_review(id):
-    r = Review.select().where(Review.id == id)
-    if len(r) is not 1:
-        raise Exception("Unable to find review, {} reviews found.".format(len(r)))
-
-    r.next().delete_instance()
+    r = Review.get_by_id(id)
+    r.delete_instance()
 
 
 def list_reviews(order_by, asc_or_desc):
@@ -99,8 +96,8 @@ def list_books_to_review():
         if not reviews:
             days_since_last_review = (datetime.date.today() - b.date_of_origin)
             if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[0]):
-                print(b.id, b.name)
+                yield b
         else:
             days_since_last_review = (datetime.date.today() - reviews[-1].date_of_review)
             if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[len(reviews)]):
-                print(b.id, b.name)
+                yield b

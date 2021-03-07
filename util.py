@@ -6,3 +6,4 @@ def print_books(books):
 def print_reviews(reviews):
     for r in reviews:
         print(r.id, r.book.name, r.date_of_review)
+

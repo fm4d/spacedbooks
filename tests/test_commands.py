@@ -3,8 +3,8 @@ import datetime
 
 from db_models import Book, Review
 from peewee import SqliteDatabase
-from commands import add_book, get_book, list_books, remove_book, add_review, remove_review
-
+from commands import add_book, get_book, list_books, remove_book, add_review, remove_review, list_books_to_review
+from config import SPACED_REPETITION_INTERVALS
 
 
 test_db = SqliteDatabase(':memory:')
@@ -84,3 +84,92 @@ def test_remove_book():
 
     assert len(books) == 1
     assert books[0].name == "Test Book 2"
+
+
+def test_list_books():
+    add_book("Test Book 1", '+0')
+    add_book("Test Book 2", '+5')
+    add_book("Test Book 3", '-5')
+
+    books = list_books('name', 'asc')
+
+    assert (books[0].id == 1 and books[0].name == "Test Book 1" and books[0].date_of_origin == datetime.date.today())
+    assert (books[1].id == 2 and books[1].name == "Test Book 2"
+            and books[1].date_of_origin == datetime.date.today() + datetime.timedelta(5))
+    assert (books[2].id == 3 and books[2].name == "Test Book 3"
+            and books[2].date_of_origin == datetime.date.today() - datetime.timedelta(5))
+
+
+def test_add_review_by_name():
+    add_book("Test Book 1", '+0')
+    add_review("Test Book 1", '-3')
+
+    reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
+
+    assert len(reviews) == 1
+    assert reviews[0].date_of_review == datetime.date.today() - datetime.timedelta(3)
+    assert reviews[0].book.name == "Test Book 1"
+
+
+def test_add_review_by_id():
+    add_book("Test Book 1", '+0')
+    add_review('1', '+3')
+
+    reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
+
+    assert len(reviews) == 1
+    assert reviews[0].date_of_review == datetime.date.today() + datetime.timedelta(3)
+    assert reviews[0].book.name == "Test Book 1"
+
+
+def test_remove_review():
+    add_book("Test Book 1", '+0')
+    add_review('1', '+3')
+
+    reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
+    assert len(reviews) == 1
+
+    remove_review(1)
+    reviews_after_remove = list(Review.select().join(Book, on=(Review.book == Book.id)))
+    assert len(reviews_after_remove) == 0
+
+
+def test_list_reviews():
+    add_book("Test Book 1", '+0')
+    add_book("Test Book 2", '+0')
+    add_review("Test Book 1", '-3')
+    add_review("Test Book 1", '-3')
+    add_review("Test Book 2", '-3')
+
+    assert len(list(Review.select().
+                    join(Book, on=(Review.book == Book.id)).
+                    where(Book.name == "Test Book 1"))) == 2
+    assert len(list(Review.select().
+                    join(Book, on=(Review.book == Book.id)).
+                    where(Book.name == "Test Book 2"))) == 1
+
+
+def test_list_books_to_review_without_reviews():
+    add_book("Test Book 1", '-31')
+
+    books_to_review = list(list_books_to_review())
+
+    assert len(books_to_review) == 1
+    assert books_to_review[0].name == "Test Book 1"
+
+
+def test_list_books_to_review_short():
+    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0]))
+
+    books_to_review = list(list_books_to_review())
+
+    assert len(books_to_review) == 0
+
+
+def test_list_books_to_review():
+    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
+
+    books_to_review = list(list_books_to_review())
+
+    assert len(books_to_review) == 1
+    assert books_to_review[0].name == "Test Book 1"
