@@ -1,6 +1,6 @@
 import datetime
 
-from db_models import Book, Review
+from src.db_models import Book, Review
 from config import SPACED_REPETITION_INTERVALS, LOGGER
 
 

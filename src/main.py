@@ -2,10 +2,10 @@
 
 import argparse
 
-from db_models import db, Book, Review
-from commands import (add_review, add_book, list_reviews, list_books,
-                      remove_book, list_books_to_review, remove_review)
-from util import print_reviews, print_books
+from src.db_models import db, Book, Review
+from src.commands import (add_review, add_book, list_reviews, list_books,
+                          remove_book, list_books_to_review, remove_review)
+from src.util import print_reviews, print_books
 
 
 def create_argparser():

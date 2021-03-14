@@ -1,9 +1,8 @@
-import pytest
 import datetime
 
-from db_models import Book, Review
+from src.db_models import Book, Review
 from peewee import SqliteDatabase
-from commands import add_book, _get_book, list_books, remove_book, add_review, remove_review, list_books_to_review
+from src.commands import add_book, _get_book, list_books, remove_book, add_review, remove_review, list_books_to_review
 from config import SPACED_REPETITION_INTERVALS
 
 
