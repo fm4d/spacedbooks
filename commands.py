@@ -17,7 +17,7 @@ def add_book(name, date_shift):
     LOGGER.debug("Created new Book(id, name={}, date_origin={})".format(id, name, adjusted_date))
 
 
-def get_book(name_or_id):
+def _get_book(name_or_id):
     if name_or_id.isdigit():
         book = Book.get(Book.id == name_or_id)
     else:
@@ -27,7 +27,7 @@ def get_book(name_or_id):
 
 
 def remove_book(name_or_id):
-    book_to_remove = get_book(name_or_id)
+    book_to_remove = _get_book(name_or_id)
     id, name = book_to_remove.id, book_to_remove.name
     book_to_remove.delete_instance()
 
@@ -58,7 +58,7 @@ def add_review(name_or_id, date_shift):
     else:
         raise Exception("Only +XX or -XX allowed for add_review date")
 
-    book = get_book(name_or_id)
+    book = _get_book(name_or_id)
     Review(book=book, date_of_review=adjusted_date).save()
 
     LOGGER.debug("Created Review(Book.name={}, date_of_review={})".format(
@@ -89,15 +89,25 @@ def list_reviews(order_by, asc_or_desc):
     return list(Review.select().join(Book, on=(Review.book == Book.id)).order_by(order_field))
 
 
-def list_books_to_review():
+def _get_books_and_overdue_days_to_review():
     for b in Book.select():
         reviews = Review.select().join(Book, on=(Review.book == Book.id)).where(Book.id == b.id).order_by(Review.date_of_review.asc())
 
         if not reviews:
-            days_since_last_review = (datetime.date.today() - b.date_of_origin)
-            if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[0]):
-                yield b
+            days_since_last_review = (datetime.date.today() - b.date_of_origin).days
+            if days_since_last_review > SPACED_REPETITION_INTERVALS[0]:
+                days_overdue = days_since_last_review - SPACED_REPETITION_INTERVALS[0]
+                yield (days_overdue, b)
         else:
-            days_since_last_review = (datetime.date.today() - reviews[-1].date_of_review)
-            if days_since_last_review > datetime.timedelta(SPACED_REPETITION_INTERVALS[len(reviews)]):
-                yield b
+            days_since_last_review = (datetime.date.today() - reviews[-1].date_of_review).days
+            # days_past_scheduled_review = SPACED_REPETITION_INTERVALS[len(reviews)]) - days_since_last_review
+            if days_since_last_review > SPACED_REPETITION_INTERVALS[len(reviews)]:
+                days_overdue = days_since_last_review - SPACED_REPETITION_INTERVALS[0]
+                yield (days_overdue, b)
+
+
+def list_books_to_review():
+    """ sort (days_overdue, book) tuple by days_overdue, more days_overdue => first in sorted list"""
+    days_books_pairs = list(_get_books_and_overdue_days_to_review())
+    days_books_pairs.sort(key=lambda t: t[0], reverse=True)
+    return [p[1] for p in days_books_pairs]
