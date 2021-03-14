@@ -14,6 +14,8 @@ def create_argparser():
 
     add_book_parser = subparsers.add_parser('add-book')
     add_book_parser.add_argument('name', type=str, help="book name", action='store')
+    add_book_parser.add_argument('author', type=str, help="book author", action='store')
+    add_book_parser.add_argument('--isbn', type=str, help="book isbn", action='store', nargs='?', default='')
     add_book_parser.add_argument('date_shift', type=str, help="+ or - X days",
                                  nargs='?', default='+0')
 
@@ -51,7 +53,7 @@ if __name__ == '__main__':
     arg_parser = create_argparser()
     cli_args = arg_parser.parse_args()
     if cli_args.command == 'add-book':
-        add_book(cli_args.name, cli_args.date_shift)
+        add_book(cli_args.name, cli_args.author, cli_args.isbn, cli_args.date_shift)
     elif cli_args.command == 'remove-book':
         remove_book(cli_args.name)
     elif cli_args.command == 'list-books':

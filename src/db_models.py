@@ -8,6 +8,8 @@ db = SqliteDatabase('books.db')
 
 class Book(Model):
     name = CharField()
+    author = CharField()
+    isbn = CharField()
     date_created = DateField(default=datetime.date.today)
     date_of_origin = DateField(default=datetime.date.today)
 
