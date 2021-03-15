@@ -27,7 +27,7 @@ def teardown_function(function):
 
 
 def test_add_book():
-    add_book("Test Book", '+0')
+    add_book("Test Book", "Test Author", date_shift='+0')
 
     assert len(Book.select()) == 1
 
@@ -38,7 +38,7 @@ def test_add_book():
 
 
 def test_add_book_shifted_plus():
-    add_book("Test Book", '+5')
+    add_book("Test Book", "Test Author", date_shift='+5')
 
     assert len(Book.select()) == 1
 
@@ -49,7 +49,7 @@ def test_add_book_shifted_plus():
 
 
 def test_add_book_shifted_minus():
-    add_book("Test Book", '-5')
+    add_book("Test Book", "Test Author", date_shift='-5')
 
     assert len(Book.select()) == 1
 
@@ -60,9 +60,9 @@ def test_add_book_shifted_minus():
 
 
 def test_get_book():
-    add_book("Test Book 1", '+0')
-    add_book("Test Book 2", '+0')
-    add_book("Test Book 3", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
+    add_book("Test Book 2", "Test Author", date_shift='+0')
+    add_book("Test Book 3", "Test Autohr", date_shift='+0')
 
     book1 = _get_book("Test Book 1")
     book2 = _get_book('2')
@@ -72,9 +72,9 @@ def test_get_book():
 
 
 def test_remove_book():
-    add_book("Test Book 1", '+0')
-    add_book("Test Book 2", '+0')
-    add_book("Test Book 3", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
+    add_book("Test Book 2", "Test Author", date_shift='+0')
+    add_book("Test Book 3", "Test Author", date_shift='+0')
 
     remove_book("Test Book 1")
     remove_book("Test Book 3")
@@ -86,9 +86,9 @@ def test_remove_book():
 
 
 def test_list_books():
-    add_book("Test Book 1", '+0')
-    add_book("Test Book 2", '+5')
-    add_book("Test Book 3", '-5')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
+    add_book("Test Book 2", "Test Author", date_shift='+5')
+    add_book("Test Book 3", "Test Author", date_shift='-5')
 
     books = list_books('name', 'asc')
 
@@ -100,7 +100,7 @@ def test_list_books():
 
 
 def test_add_review_by_name():
-    add_book("Test Book 1", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
     add_review("Test Book 1", '-3')
 
     reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
@@ -111,7 +111,7 @@ def test_add_review_by_name():
 
 
 def test_add_review_by_id():
-    add_book("Test Book 1", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
     add_review('1', '+3')
 
     reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
@@ -122,7 +122,7 @@ def test_add_review_by_id():
 
 
 def test_remove_review():
-    add_book("Test Book 1", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
     add_review('1', '+3')
 
     reviews = list(Review.select().join(Book, on=(Review.book == Book.id)))
@@ -134,8 +134,8 @@ def test_remove_review():
 
 
 def test_list_reviews():
-    add_book("Test Book 1", '+0')
-    add_book("Test Book 2", '+0')
+    add_book("Test Book 1", "Test Author", date_shift='+0')
+    add_book("Test Book 2", "Test Author", date_shift='+0')
     add_review("Test Book 1", '-3')
     add_review("Test Book 1", '-3')
     add_review("Test Book 2", '-3')
@@ -149,7 +149,7 @@ def test_list_reviews():
 
 
 def test_list_books_to_review_without_reviews():
-    add_book("Test Book 1", '-31')
+    add_book("Test Book 1", "Test Author", date_shift='-31')
 
     books_to_review = list_books_to_review()
 
@@ -158,7 +158,7 @@ def test_list_books_to_review_without_reviews():
 
 
 def test_list_books_to_review_short():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0]))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0]))
 
     books_to_review = list_books_to_review()
 
@@ -166,7 +166,7 @@ def test_list_books_to_review_short():
 
 
 def test_list_books_to_review():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
 
     books_to_review = list_books_to_review()
 
@@ -175,9 +175,9 @@ def test_list_books_to_review():
 
 
 def test_list_books_to_review_multiple_books():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
-    add_book("Test Book 2", '-' + str(SPACED_REPETITION_INTERVALS[0] + 3))
-    add_book("Test Book 3", '-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
+    add_book("Test Book 2", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 3))
+    add_book("Test Book 3", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
 
     books_to_review = list_books_to_review()
 
@@ -188,10 +188,10 @@ def test_list_books_to_review_multiple_books():
 
 
 def test_list_books_to_review_multiple_books_with_shorts():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
-    add_book("Test Book 2", '-' + str(SPACED_REPETITION_INTERVALS[0] + 3))
-    add_book("Test Book 3", '-' + str(SPACED_REPETITION_INTERVALS[0] - 3))
-    add_book("Test Book 4", '-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 1))
+    add_book("Test Book 2", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 3))
+    add_book("Test Book 3", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] - 3))
+    add_book("Test Book 4", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
 
     books_to_review = list_books_to_review()
 
@@ -202,7 +202,7 @@ def test_list_books_to_review_multiple_books_with_shorts():
 
 
 def test_list_books_to_review_multiple_reviews():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[3] + 5))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[3] + 5))
     add_review("Test Book 1", '-' + str((SPACED_REPETITION_INTERVALS[3] + 5) - (SPACED_REPETITION_INTERVALS[0] + 1)))
     add_review("Test Book 1", '-' + str((SPACED_REPETITION_INTERVALS[3] + 5) - (SPACED_REPETITION_INTERVALS[1] + 1)))
 
@@ -213,7 +213,7 @@ def test_list_books_to_review_multiple_reviews():
 
 
 def test_list_books_to_review_multiple_reviews_short():
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[3] - 5))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[3] - 5))
     add_review("Test Book 1", '-' + str((SPACED_REPETITION_INTERVALS[3] - 5) - (SPACED_REPETITION_INTERVALS[0] + 1)))
     add_review("Test Book 1", '-' + str((SPACED_REPETITION_INTERVALS[3] - 5) - (SPACED_REPETITION_INTERVALS[1] + 1)))
 
@@ -223,9 +223,9 @@ def test_list_books_to_review_multiple_reviews_short():
 
 
 def test_list_books_to_review_with_sort_multiple_reviews():
-    add_book("Test Book 2", '-' + str(SPACED_REPETITION_INTERVALS[2]))
+    add_book("Test Book 2", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[2]))
     add_review("Test Book 2", '-' + str(SPACED_REPETITION_INTERVALS[2] - (SPACED_REPETITION_INTERVALS[0] + 2)))
-    add_book("Test Book 1", '-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
+    add_book("Test Book 1", "Test Author", date_shift='-' + str(SPACED_REPETITION_INTERVALS[0] + 5))
 
     books_to_review = list_books_to_review()
 

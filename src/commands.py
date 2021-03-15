@@ -4,7 +4,7 @@ from src.db_models import Book, Review
 from config import SPACED_REPETITION_INTERVALS, LOGGER
 
 
-def add_book(name, author, isbn, date_shift):
+def add_book(name, author, isbn='', date_shift='+0'):
     if date_shift[0] == '+':
         adjusted_date = datetime.date.today() + datetime.timedelta(int(date_shift[1:]))
     elif date_shift[0] == '-':
