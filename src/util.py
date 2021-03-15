@@ -9,6 +9,15 @@ def print_books(books):
         ))
 
 
+def print_books_to_review(books):
+    for b in books:
+        print('[{}] "{}" by {}'.format(
+            b.id,
+            b.name[:50] + "..." if len(b.name) > 50 else b.name,
+            b.author
+        ))
+
+
 def print_reviews(reviews):
     for r in reviews:
         print(r.id, r.book.name, r.books.author, r.date_of_review)
