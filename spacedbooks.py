@@ -4,7 +4,8 @@ import argparse
 
 from src.db_models import db, Book, Review
 from src.commands import (add_review, add_book, list_reviews, list_books,
-                          remove_book, list_books_to_review, remove_review)
+                          remove_book, list_books_to_review, remove_review,
+                          send_mail_with_reviews)
 from src.util import print_reviews, print_books, print_books_to_review
 
 
@@ -43,6 +44,8 @@ def create_argparser():
     remove_review_parser = subparsers.add_parser('remove-review')
     remove_review_parser.add_argument('id', type=id, help="review id", action='store')
 
+    send_mail_parser = subparsers.add_parser('send-mail')
+
     return parser
 
 
@@ -64,6 +67,9 @@ if __name__ == '__main__':
         remove_review(cli_args.id)
     elif cli_args.command == 'list-reviews':
         print_reviews(list_reviews(cli_args.order_by, cli_args.asc_or_desc))
+    elif cli_args.command == 'send-mail':
+        send_mail_with_reviews()
+
     else:
         print("\n")
         print("===================")

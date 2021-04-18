@@ -1,7 +1,8 @@
 import datetime
 
 from src.db_models import Book, Review
-from config import SPACED_REPETITION_INTERVALS, LOGGER
+from config import (SPACED_REPETITION_INTERVALS, MAIL_REVIEW_COUNT, LOGGER)
+from src.util import send_mail
 
 
 def add_book(name, author, isbn='', date_shift='+0'):
@@ -111,3 +112,22 @@ def list_books_to_review():
     days_books_pairs = list(_get_books_and_overdue_days_to_review())
     days_books_pairs.sort(key=lambda t: t[0], reverse=True)
     return [p[1] for p in days_books_pairs]
+
+
+def send_mail_with_reviews():
+    books_to_review = list_books_to_review()
+
+    if len(books_to_review) == 0:
+        return
+    if len(books_to_review) <= MAIL_REVIEW_COUNT:
+        pass
+    elif len(books_to_review) > MAIL_REVIEW_COUNT:
+        books_to_review = books_to_review[:MAIL_REVIEW_COUNT]
+
+    send_mail(books_to_review)
+
+
+
+
+
+
