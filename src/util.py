@@ -38,10 +38,7 @@ def send_mail(books):
             book.author
         )
 
-    # Open a plain text file for reading.  For this example, assume that
-    # the text file contains only ASCII characters.
     msg = MIMEText("\n".join(book_to_mail_str(book) for book in books))
-
     msg['Subject'] = "Spacedbooks daily review"
     msg['From'] = MAIL_ADDRESS_SENDER
     msg['To'] = MAIL_ADDRESS_RECEIVER
