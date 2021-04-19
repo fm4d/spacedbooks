@@ -37,8 +37,11 @@ def send_mail(books):
             book.name[:50] + "..." if len(book.name) > 50 else book.name,
             book.author
         )
-
-    msg = MIMEText("\n".join(book_to_mail_str(book) for book in books))
+    banner = ("===================\n"
+              "‖ BOOKS TO REVIEW ‖\n"
+              "===================\n\n")
+    books_to_review = "\n".join(book_to_mail_str(book) for book in books)
+    msg = MIMEText(banner + books_to_review)
     msg['Subject'] = "Spacedbooks daily review"
     msg['From'] = MAIL_ADDRESS_SENDER
     msg['To'] = MAIL_ADDRESS_RECEIVER
