@@ -27,7 +27,7 @@ def print_books_to_review(books):
 
 def print_reviews(reviews):
     for r in reviews:
-        print(r.id, r.book.name, r.books.author, r.date_of_review)
+        print(r.id, r.book.name, r.book.author, r.date_of_review)
 
 
 def send_mail(books):
